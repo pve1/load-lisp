@@ -27,7 +27,7 @@ enter the REPL normally after all options have been processed.
 
 Usage:
 
-compile-lisp [--core CORE] [OPTION] ...
+load-lisp [--core CORE] [OPTION] ...
 
 Options are processed and executed in the order they appear on the
 command line.
