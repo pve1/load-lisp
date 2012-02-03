@@ -71,13 +71,17 @@ Valid spec characters are:
 
 They can be used as follows:
 
---f-FOO ARG                funcall FOO with string argument ARG
---rf-FOO ARG               read-from-string ARG, then funcall FOO with the result
---rfp-FOO ARG              read-from-string ARG, then funcall FOO, then print the result
---fp-FOO ARG               funcall FOO with string argument ARG, then print the result
---ra-FOO ARG               read-from-string ARG, then apply FOO
-                           (use like --ra-foo '(arg1 arg2 arg3)')
---rap-FOO ARG              read-from-string ARG, then apply FOO, then print the result
+--f-FOO ARG       funcall FOO with string argument ARG
+--rf-FOO ARG      read-from-string ARG, then funcall FOO with the
+                  result
+--rfp-FOO ARG     read-from-string ARG, then funcall FOO, then print
+                  the result
+--fp-FOO ARG      funcall FOO with string argument ARG, then print the
+                  result
+--ra-FOO ARG      read-from-string ARG, then apply FOO
+                  (use like --ra-foo '(arg1 arg2 arg3)')
+--rap-FOO ARG     read-from-string ARG, then apply FOO, then print the
+                  result
 
 Other spec combinations are not allowed.
 
