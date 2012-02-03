@@ -4,12 +4,51 @@ implementations is easy.  All processes are started with --no-userinit
 (or --script).  Operations are executed in the order they appear on
 the command line.
 
+The scripts load-lisp and compile-lisp should be symlinked to ~/bin.
+
+Both scripts accept the same options, but compile-lisp will invoke
+sbcl with --script, and quit after the last option has been processed,
+whereas load-lisp will call sbcl with --no-userinit and --noinform and
+enter the REPL normally after all options have been processed.
+
+
+Usage:
+
+compile-lisp [--core CORE] [OPTION] ...
+
+Supported options:
+
+-I DIR		       Add DIR to asdf registry
+-T DIR		       Add TREE asdf registry (asdf2 only)
+-S SYSTEM	       Load SYSTEM
+-R SYSTEM	       Require SYSTEM
+--eval SEXP	       Eval SEXP
+--load FILE	       Load FILE
+--compile FILE	       Compile FILE
+--load-compile FILE    First compile FILE, then load the resulting FASL
+--deps SYSTEM	       Load dependencies of SYSTEM, but not SYSTEM
+--swank [PORT]	       Start swank on the given port, or default port
+--quit		       Quit (only meaningful for load-lisp)
+--main FUNCTION        Set FUNCTION to be the toplevel function when saving a
+       		       core (use with --save option)
+--save CORE	       Save current lisp to CORE (and die)
+
+---ANYLISPSYMBOL ARG   Funcall the lisp symbol ANYLISPSYMBOL with the
+		       string argument ARG (note the three dashes).
+
+
 Usage examples:
+
+$ load-lisp --eval '(print "hello world")'
+
+- prints "hello world" then enters the REPL
+
 
 $ compile-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library 
 
 - adds systems/my-systems/ and systems/third-party/ to the asdf registry
 - loads the system "my-library", then quits.
+
 
 $ compile-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library --save my-library.core
 
@@ -17,20 +56,23 @@ $ compile-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library --sa
 - loads the system "my-library"
 - saves the core to "my-library.core".
 
+
 $ compile-lisp -I systems/my-systems/ -I systems/third-party/ -S some-system --load some-script.lisp --main my-package:my-main-function --save my-program
 
 - adds systems/my-systems/ and systems/third-party/ to the asdf registry
 - loads the system "some-system"
-- loads lisp file "some-script.lisp"
+- loads the lisp file "some-script.lisp"
 - saves an executable core to "my-program" with the toplevel function
-  my-package:my-main-function.  The "--main" switch must to precede
-  the "--save" switch.
+  my-package:my-main-function.  The "--main" switch must precede the
+  "--save" switch.
+
 
 $ load-lisp -I systems/my-systems/ -I systems/third-party/ -S util
 
 - adds systems/my-systems/ and systems/third-party/ to the asdf registry
 - loads the system "util"
 - then enters the repl
+
 
 $ load-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library -S my-web-app --swank
 
@@ -39,4 +81,28 @@ $ load-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library -S my-w
 - creates a swank server and enters the repl
 
 
+$ load-lisp -T systems/ --deps my-web-app --save base.core
+
+- adds the systems/ tree to the asdf registry (asdf2 only)
+- loads all dependencies of system "my-web-app" (but not my-web-app itself)
+- saves the core to "base.core"
+
+
+$ load-lisp --core base.core -S my-web-app --swank
+
+- starts the core "base.core"
+  - the --core flag, if given, must be the first flag of the command,
+- loads the systems "my-web-app"
+- creates a swank server and enters the repl
+
+
+$ load-lisp --load ~/quicklisp/setup.lisp ---ql:quickload alexandria
+
+- loads the file ~/quicklisp/setup.lisp
+- funcalls the function QL:QUICKLOAD with the argument "alexandria"
+  (note the three dashes to indicate arbitrary funcalling of functions
+  that take a single string argument)
+
+
 See *flag-alist* for a complete list of supported operations.
+
