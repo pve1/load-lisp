@@ -35,7 +35,7 @@ command line.
 Supported options:
 
 -I DIR		           Add DIR to asdf registry
--T DIR		           Add TREE asdf registry (asdf2 only)
+-T DIR		           Add TREE asdf to registry (asdf2 only)
 -S SYSTEM	           Load SYSTEM
 -R SYSTEM	           Require SYSTEM
 --eval SEXP	           Eval SEXP
@@ -62,7 +62,8 @@ Valid spec characters are:
 
 - r: read-from-string
 - f: funcall the function with the flag argument
-- a: apply the function with the flag argument (use like --rap-foo '(arg1 arg2 arg3)')
+- a: apply the function to the flag argument
+     (use like --rap-foo '(arg1 arg2 arg3)')
 - p: print the result
 
 They can be used as follows:
@@ -71,7 +72,8 @@ They can be used as follows:
 --rf-FOO ARG		   read-from-string ARG, then funcall FOO with the result
 --rfp-FOO ARG		   read-from-string ARG, then funcall FOO, then print the result
 --fp-FOO ARG		   funcall FOO with string argument ARG, then print the result
---ra-FOO ARG		   read-from-string ARG, then apply FOO (use like --ra-foo '(arg1 arg2 arg3)')
+--ra-FOO ARG		   read-from-string ARG, then apply FOO
+	 		   (use like --ra-foo '(arg1 arg2 arg3)')
 --rap-FOO ARG		   read-from-string ARG, then apply FOO, then print the result 
 
 Other spec combinations are not allowed.

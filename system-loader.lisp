@@ -111,7 +111,7 @@
 
 ;; - r: read-from-string
 ;; - f: funcall the function with the flag argument
-;; - a: apply the function with the flag argument (use like --rap-foo '(arg1 arg2 arg3)')
+;; - a: apply the function to the flag argument (use like --rap-foo '(arg1 arg2 arg3)')
 ;; - p: print the result
 
 
