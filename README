@@ -92,7 +92,7 @@ Usage examples:
 $ load-lisp --eval '(print "hello world")'
 $ load-lisp ---print "hello world"
 
-- both commands print "hello world" then enters the REPL
+- both commands print "hello world" then enter the REPL
 
 
 $ compile-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library
