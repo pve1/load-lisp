@@ -24,8 +24,10 @@
     ("--deps" . deps-flag)
     ("--main" . main-flag)
     ("--save" . save-flag)
+    ("--save-exe" . save-exe-flag)
     ("--swank" . swank-flag)
-    ("--quit" . quit-flag)))
+    ("--quit" . quit-flag)
+    ("--install" . install-arg-handler-flag)))
 
 ;;;; Flag functions
 
@@ -38,11 +40,22 @@
 (defun main-flag (x)
   (setf *toplevel-function* (read-from-string-standard x)))
 
-(defun save-flag (x)
+(defun save-exe-flag (x)
+  (save-flag x :executable t :inhibit-userinit t))
+
+(defun inhibit-userinit ()
+  (setf sb-ext::*userinit-pathname-function* (constantly nil)))
+
+(defun save-flag (x &key executable inhibit-userinit)
   (let ((f (lambda (&rest rest)
              (apply #'sb-ext:save-lisp-and-die x
-                    :executable *toplevel-function*
+                    :executable (or *toplevel-function* 
+                                    executable)
                     rest))))
+
+    (when inhibit-userinit
+      (pushnew 'inhibit-userinit sb-ext:*init-hooks*))
+
     (if *toplevel-function*
         (funcall f :toplevel *toplevel-function*)
         (funcall f))))
@@ -83,6 +96,8 @@
   #-asdf2 (error "Only ASDF2 supports the tree option.")
   (add-dir-to-asdf dir t))
 
+(defun install-arg-handler-flag (&optional x)
+  (pushnew 'handle-posix-argv sb-ext:*init-hooks*))
 
 
 ;;;; Arbitrary-funcall "---print ..."
@@ -177,6 +192,8 @@
                 (funcall (make-apply-flag-function flag) arg))
                (fn (funcall fn arg)))))
 
+(defun handle-posix-argv ()
+  (handle-args sb-ext:*posix-argv*))
 
 ;; Handle args at load-time.
-(handle-args sb-ext:*posix-argv*)
+(handle-posix-argv)
