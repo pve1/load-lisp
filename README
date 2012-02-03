@@ -1,0 +1,42 @@
+Convenient command line interface for common lisp operations.
+Currently SBCL is supported, but adding support for other
+implementations is easy.  All processes are started with --no-userinit
+(or --script).  Operations are executed in the order they appear on
+the command line.
+
+Usage examples:
+
+$ compile-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library 
+
+- adds systems/my-systems/ and systems/third-party/ to the asdf registry
+- loads the system "my-library", then quits.
+
+$ compile-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library --save my-library.core
+
+- adds systems/my-systems/ and systems/third-party/ to the asdf registry
+- loads the system "my-library"
+- saves the core to "my-library.core".
+
+$ compile-lisp -I systems/my-systems/ -I systems/third-party/ -S some-system --load some-script.lisp --main my-package:my-main-function --save my-program
+
+- adds systems/my-systems/ and systems/third-party/ to the asdf registry
+- loads the system "some-system"
+- loads lisp file "some-script.lisp"
+- saves an executable core to "my-program" with the toplevel function
+  my-package:my-main-function.  The "--main" switch must to precede
+  the "--save" switch.
+
+$ load-lisp -I systems/my-systems/ -I systems/third-party/ -S util
+
+- adds systems/my-systems/ and systems/third-party/ to the asdf registry
+- loads the system "util"
+- then enters the repl
+
+$ load-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library -S my-web-app --swank
+
+- adds systems/my-systems/ and systems/third-party/ to the asdf registry
+- loads the systems "my-library" and "my-web-app"
+- creates a swank server and enters the repl
+
+
+See *flag-alist* for a complete list of supported operations.
