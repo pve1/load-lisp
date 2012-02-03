@@ -1,4 +1,4 @@
-Convenient command line interface for common lisp operations.
+Convenient command line interface for (common) common lisp operations.
 Currently SBCL is supported, but adding support for other
 implementations is easy.  All processes are started with --no-userinit
 (or --script).  Operations are executed in the order they appear on
@@ -18,30 +18,56 @@ compile-lisp [--core CORE] [OPTION] ...
 
 Supported options:
 
--I DIR		       Add DIR to asdf registry
--T DIR		       Add TREE asdf registry (asdf2 only)
--S SYSTEM	       Load SYSTEM
--R SYSTEM	       Require SYSTEM
---eval SEXP	       Eval SEXP
---load FILE	       Load FILE
---compile FILE	       Compile FILE
---load-compile FILE    First compile FILE, then load the resulting FASL
---deps SYSTEM	       Load dependencies of SYSTEM, but not SYSTEM
---swank [PORT]	       Start swank on the given port, or default port
---quit		       Quit (only meaningful for load-lisp)
---main FUNCTION        Set FUNCTION to be the toplevel function when saving a
-       		       core (use with --save option)
---save CORE	       Save current lisp to CORE (and die)
+-I DIR		           Add DIR to asdf registry
+-T DIR		           Add TREE asdf registry (asdf2 only)
+-S SYSTEM	           Load SYSTEM
+-R SYSTEM	           Require SYSTEM
+--eval SEXP	           Eval SEXP
+--load FILE	           Load FILE
+--compile FILE	           Compile FILE
+--load-compile FILE        First compile FILE, then load the resulting FASL
+--deps SYSTEM	           Load dependencies of SYSTEM, but not SYSTEM
+--swank [PORT]	           Start swank on the given port, or default port
+--quit		           Quit (only meaningful for load-lisp)
+--main FUNCTION            Set FUNCTION to be the toplevel function when saving a
+       		           core (use with --save option)
+--save CORE	           Save current lisp to CORE (and die)
+		           
+---ANYLISPSYMBOL [ARG]     Funcall the lisp symbol ANYLISPSYMBOL with the
+		           string argument ARG (note the three dashes).
+		           If ARG starts with "-" then it is ignored.
+		           (use a backslash, like '\-...' to prevent this)
 
----ANYLISPSYMBOL ARG   Funcall the lisp symbol ANYLISPSYMBOL with the
-		       string argument ARG (note the three dashes).
 
+So called 'apply-flags' are also supported.  Each flag contains one or
+more spec characters followed by a lisp function name. 
+
+Valid spec characters are:
+
+- r: read-from-string
+- f: funcall the function with the flag argument
+- a: apply the function with the flag argument (use like --rap-foo '(arg1 arg2 arg3)')
+- p: print the result
+
+They can be used as follows:
+
+--f-FOO ARG                funcall FOO with string argument ARG  
+--rf-FOO ARG		   read-from-string ARG, then funcall FOO with the result
+--rfp-FOO ARG		   read-from-string ARG, then funcall FOO, then print the result
+--fp-FOO ARG		   funcall FOO with string argument ARG, then print the result
+--ra-FOO ARG		   read-from-string ARG, then apply FOO (use like --ra-foo '(arg1 arg2 arg3)')
+--rap-FOO ARG		   read-from-string ARG, then apply FOO, then print the result 
+
+Other spec combinations are not allowed.
+
+--------------
 
 Usage examples:
 
 $ load-lisp --eval '(print "hello world")'
+$ load-lisp ---print "hello world"
 
-- prints "hello world" then enters the REPL
+- both commands print "hello world" then enters the REPL
 
 
 $ compile-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library 
@@ -88,12 +114,13 @@ $ load-lisp -T systems/ --deps my-web-app --save base.core
 - saves the core to "base.core"
 
 
-$ load-lisp --core base.core -S my-web-app --swank
+$ load-lisp --core base.core -S my-web-app ---set-server-port 10000 ---start-server
 
 - starts the core "base.core"
   - the --core flag, if given, must be the first flag of the command,
 - loads the systems "my-web-app"
-- creates a swank server and enters the repl
+- funcalls CL-USER::SET-SERVER-PORT with the string argument "10000"
+- funcalls CL-USER::START-SERVER with no arguments
 
 
 $ load-lisp --load ~/quicklisp/setup.lisp ---ql:quickload alexandria
@@ -101,8 +128,5 @@ $ load-lisp --load ~/quicklisp/setup.lisp ---ql:quickload alexandria
 - loads the file ~/quicklisp/setup.lisp
 - funcalls the function QL:QUICKLOAD with the argument "alexandria"
   (note the three dashes to indicate arbitrary funcalling of functions
-  that take a single string argument)
-
-
-See *flag-alist* for a complete list of supported operations.
+  that take at most one string argument)
 
