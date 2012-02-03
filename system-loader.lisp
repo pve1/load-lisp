@@ -9,23 +9,23 @@
 (defparameter *toplevel-function* nil)
 
 (defun read-from-string-standard (s)
-  (with-standard-io-syntax 
+  (with-standard-io-syntax
     (read-from-string s)))
 
-(defparameter *flag-alist* 
+(defparameter *flag-alist*
   `(("-I" . add-dir-to-asdf)
     ("-T" . add-tree-to-asdf)
     ("-S" . asdf:load-system)
     ("-R" . require)
     ("--load" . load)
     ("--compile" . compile-file)
-    ("--eval" . eval-flag)    
+    ("--eval" . eval-flag)
     ("--load-compile" . load-compile-flag)
     ("--deps" . deps-flag)
     ("--main" . main-flag)
     ("--save" . save-flag)
     ("--swank" . swank-flag)
-    ("--quit" . quit-flag)))    
+    ("--quit" . quit-flag)))
 
 ;;;; Flag functions
 
@@ -40,25 +40,25 @@
 
 (defun save-flag (x)
   (let ((f (lambda (&rest rest)
-	     (apply #'sb-ext:save-lisp-and-die x 
-		    :executable *toplevel-function* 
-		    rest))))
+             (apply #'sb-ext:save-lisp-and-die x
+                    :executable *toplevel-function*
+                    rest))))
     (if *toplevel-function*
-	(funcall f :toplevel *toplevel-function*)
-	(funcall f))))
+        (funcall f :toplevel *toplevel-function*)
+        (funcall f))))
 
 (defun deps-flag (x)
-  (mapc #'asdf:load-system 
-	(asdf::component-load-dependencies 
-	 (asdf::find-system x))))
+  (mapc #'asdf:load-system
+        (asdf::component-load-dependencies
+         (asdf::find-system x))))
 
 (defun swank-flag (&optional x)
   (let ((x (and x (read-from-string-standard x))))
     (asdf:load-system :swank)
     (if (integerp x)
-	(funcall (read-from-string-standard "SWANK::CREATE-SERVER") :port x)
-	(funcall (read-from-string-standard "SWANK::CREATE-SERVER")))))
-  
+        (funcall (read-from-string-standard "SWANK::CREATE-SERVER") :port x)
+        (funcall (read-from-string-standard "SWANK::CREATE-SERVER")))))
+
 (defun quit-flag (&optional x)
   (declare (ignore x))
   (sb-ext:quit))
@@ -67,21 +67,21 @@
   (setf dir (concatenate 'string dir "/"))
   #+asdf2
   (push `(:source-registry
-	  (,(if tree 
-		:tree
-		:directory)
-	    ,(if (asdf::absolute-pathname-p dir)
-		 dir
-		 `(:here ,dir)))
-	  :inherit-configuration)
-	asdf:*default-source-registries*)
+          (,(if tree
+                :tree
+                :directory)
+            ,(if (asdf::absolute-pathname-p dir)
+                 dir
+                 `(:here ,dir)))
+          :inherit-configuration)
+        asdf:*default-source-registries*)
   #-asdf2
   (push (concatenate 'string dir "/")
-	asdf:*central-registry*)) 
+        asdf:*central-registry*))
 
 (defun add-tree-to-asdf (dir)
   #-asdf2 (error "Only ASDF2 supports the tree option.")
-  (add-dir-to-asdf dir t)) 
+  (add-dir-to-asdf dir t))
 
 
 
@@ -89,8 +89,8 @@
 
 (defun prefixp (prefix string)
   (let ((offset (search prefix string)))
-    (and (numberp offset) 
-	 (zerop offset))))
+    (and (numberp offset)
+         (zerop offset))))
 
 (defun arbitrary-funcall-p (flag)
   (prefixp "---" flag))
@@ -98,15 +98,15 @@
 (defun arbitrary-funcall (flag arg)
   (let ((fun (read-from-string-standard (subseq flag 3))))
     (cond ((or (null arg)
-	       (prefixp "-" arg) )
-	   (funcall fun))
-	  ((prefixp "\\-" arg)
-	   (funcall fun (subseq arg 1)))
-	  (t (funcall fun arg)))))
+               (prefixp "-" arg) )
+           (funcall fun))
+          ((prefixp "\\-" arg)
+           (funcall fun (subseq arg 1)))
+          (t (funcall fun arg)))))
 
 
 
-;;;; Apply flags, kind of silly. 
+;;;; Apply flags, kind of silly.
 ;; Valid spec characters are:
 
 ;; - r: read-from-string
@@ -115,7 +115,7 @@
 ;; - p: print the result
 
 
-;; Examples: 
+;; Examples:
 
 ;: load-lisp --rfp-foo 100
 ;; - read-from-string "100"
@@ -131,11 +131,11 @@
 (defun apply-flag-op (&rest functions)
   (lambda (function arg)
     (reduce (lambda (result f)
-	      (case f
-		(apply-the-function (apply function result))
-		(funcall-the-function (funcall function result))
-		(t (funcall f result))))
-	    functions :initial-value arg)))
+              (case f
+                (apply-the-function (apply function result))
+                (funcall-the-function (funcall function result))
+                (t (funcall f result))))
+            functions :initial-value arg)))
 
 (defparameter *apply-flag-prefixes*
   `(("--f-" . ,(apply-flag-op 'funcall-the-function))
@@ -147,18 +147,18 @@
 
 (defun find-apply-flag (flag)
   (assoc-if (lambda (x) (prefixp x flag))
-	    *apply-flag-prefixes*))
+            *apply-flag-prefixes*))
 
 (defun make-apply-flag-function (flag)
   (let* ((apply-flag-entry (find-apply-flag flag))
-	 (apply-flag-spec (car apply-flag-entry))
-	 (apply-flag-op (cdr apply-flag-entry))
-	 
-	 ;; --rf-foo-bar ==> foo-bar
-	 (function-name (when apply-flag-entry
-			  (read-from-string-standard 
-			   (subseq flag (length apply-flag-spec))))))
-    
+         (apply-flag-spec (car apply-flag-entry))
+         (apply-flag-op (cdr apply-flag-entry))
+
+         ;; --rf-foo-bar ==> foo-bar
+         (function-name (when apply-flag-entry
+                          (read-from-string-standard
+                           (subseq flag (length apply-flag-spec))))))
+
     (assert apply-flag-op)
     (lambda (arg)
       (funcall apply-flag-op function-name arg))))
@@ -172,10 +172,10 @@
   (loop :for (flag arg) :on args :by #'cdr
      :for fn = (cdr (assoc flag *flag-alist* :test #'string=))
      :do (cond ((arbitrary-funcall-p flag)
-		(arbitrary-funcall flag arg))
-	       ((apply-flag-p flag)
-		(funcall (make-apply-flag-function flag) arg))
-	       (fn (funcall fn arg))))) 
+                (arbitrary-funcall flag arg))
+               ((apply-flag-p flag)
+                (funcall (make-apply-flag-function flag) arg))
+               (fn (funcall fn arg)))))
 
 
 ;; Handle args at load-time.

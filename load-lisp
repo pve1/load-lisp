@@ -2,6 +2,3 @@
 HERE=`dirname \`readlink -f $0\``
 [ "$1" = "--core" ] && CORE="--core $2" && shift 2
 sbcl $CORE --noinform --no-userinit --load $HERE/system-loader.lisp $LOAD_LISP_FLAGS "$@"
-
-
-

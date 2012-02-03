@@ -34,29 +34,32 @@ command line.
 
 Supported options:
 
--I DIR		           Add DIR to asdf registry
--T DIR		           Add TREE asdf to registry (asdf2 only)
--S SYSTEM	           Load SYSTEM
--R SYSTEM	           Require SYSTEM
---eval SEXP	           Eval SEXP
---load FILE	           Load FILE
---compile FILE	           Compile FILE
---load-compile FILE        First compile FILE, then load the resulting FASL
---deps SYSTEM	           Load dependencies of SYSTEM, but not SYSTEM
---swank [PORT]	           Start swank on the given port, or default port
---quit		           Quit (only meaningful for load-lisp)
---main FUNCTION            Set FUNCTION to be the toplevel function when saving a
-       		           core (use with --save option)
---save CORE	           Save current lisp to CORE (and die)
-		           
----ANYLISPSYMBOL [ARG]     Funcall the lisp symbol ANYLISPSYMBOL with the
-		           string argument ARG (note the three dashes).
-		           If ARG starts with "-" then it is ignored.
-		           (use a backslash, like '\-...' to prevent this)
+-I DIR                   Add DIR to asdf registry
+-T DIR                   Add TREE asdf to registry (asdf2 only)
+-S SYSTEM                Load SYSTEM
+-R SYSTEM                Require SYSTEM
+--eval SEXP              Eval SEXP
+--load FILE              Load FILE
+--compile FILE           Compile FILE
+--load-compile FILE      First compile FILE, then load the resulting FASL
+--deps SYSTEM            Load dependencies of SYSTEM, but not SYSTEM
+--swank [PORT]           Start swank on the given port, or default port
+--quit                   Quit (only meaningful for load-lisp)
+
+--main FUNCTION          Set FUNCTION to be the toplevel function when
+                         saving a core (use with --save option)
+
+--save CORE              Save current lisp to CORE (and die)
+
+---ANYLISPSYMBOL [ARG]   Funcall the lisp symbol ANYLISPSYMBOL with
+                         the string argument ARG (note the three
+                         dashes).  If ARG starts with "-" then it is
+                         ignored.  (use a backslash, like '\-...' to
+                         prevent this)
 
 
 So called 'apply-flags' are also supported.  Each flag contains one or
-more spec characters followed by a lisp function name. 
+more spec characters followed by a lisp function name.
 
 Valid spec characters are:
 
@@ -68,13 +71,13 @@ Valid spec characters are:
 
 They can be used as follows:
 
---f-FOO ARG                funcall FOO with string argument ARG  
---rf-FOO ARG		   read-from-string ARG, then funcall FOO with the result
---rfp-FOO ARG		   read-from-string ARG, then funcall FOO, then print the result
---fp-FOO ARG		   funcall FOO with string argument ARG, then print the result
---ra-FOO ARG		   read-from-string ARG, then apply FOO
-	 		   (use like --ra-foo '(arg1 arg2 arg3)')
---rap-FOO ARG		   read-from-string ARG, then apply FOO, then print the result 
+--f-FOO ARG                funcall FOO with string argument ARG
+--rf-FOO ARG               read-from-string ARG, then funcall FOO with the result
+--rfp-FOO ARG              read-from-string ARG, then funcall FOO, then print the result
+--fp-FOO ARG               funcall FOO with string argument ARG, then print the result
+--ra-FOO ARG               read-from-string ARG, then apply FOO
+                           (use like --ra-foo '(arg1 arg2 arg3)')
+--rap-FOO ARG              read-from-string ARG, then apply FOO, then print the result
 
 Other spec combinations are not allowed.
 
@@ -88,7 +91,7 @@ $ load-lisp ---print "hello world"
 - both commands print "hello world" then enters the REPL
 
 
-$ compile-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library 
+$ compile-lisp -I systems/my-systems/ -I systems/third-party/ -S my-library
 
 - adds systems/my-systems/ and systems/third-party/ to the asdf registry
 - loads the system "my-library", then quits.
@@ -147,4 +150,3 @@ $ load-lisp --load ~/quicklisp/setup.lisp ---ql:quickload alexandria
 - funcalls the function QL:QUICKLOAD with the argument "alexandria"
   (note the three dashes to indicate arbitrary funcalling of functions
   that take at most one string argument)
-
