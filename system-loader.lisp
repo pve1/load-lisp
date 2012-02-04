@@ -49,7 +49,7 @@
 (defun save-flag (x &key executable inhibit-userinit)
   (let ((f (lambda (&rest rest)
              (apply #'sb-ext:save-lisp-and-die x
-                    :executable (or *toplevel-function* 
+                    :executable (or *toplevel-function*
                                     executable)
                     rest))))
 
