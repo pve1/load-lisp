@@ -101,7 +101,8 @@ They can be used as follows:
 --rap-FOO ARG     read-from-string ARG, then apply FOO, then print the
                   result
 
-Other spec combinations are not allowed.
+Mirrored specs are also recognized (fr, pf, pfr, ar, par).  Other spec
+combinations are not allowed.
 
 --------------
 
