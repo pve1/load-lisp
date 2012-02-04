@@ -1,3 +1,8 @@
+;; This software is Copyright (c) Peter von Etter, 2012.
+;; You can distribute and use it as governed by the terms of the Lisp
+;; Lesser GNU Public License
+;; (http://opensource.franz.com/preamble.html), known as the LLGPL.
+
 (defpackage :load-lisp
   (:use :cl))
 
