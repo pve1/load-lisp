@@ -51,6 +51,19 @@ Supported options:
 
 --save CORE              Save current lisp to CORE (and die)
 
+--save-exe CORE          Save an executable core to CORE
+                          - The user init-file is not loaded by this
+                            core at startup
+                          - The debugger is disabled
+
+                         Tip: combine this option with
+                         "--install --main quit"
+
+--install                Install the load-lisp argument handler code
+                         into a core being saved.  The core will be
+                         able to process all the flags documented
+                         here on its own.
+
 ---ANYLISPSYMBOL [ARG]   Funcall the lisp symbol ANYLISPSYMBOL with
                          the string argument ARG (note the three
                          dashes).  If ARG starts with "-" then it is
@@ -154,3 +167,13 @@ $ load-lisp --load ~/quicklisp/setup.lisp ---ql:quickload alexandria
 - funcalls the function QL:QUICKLOAD with the argument "alexandria"
   (note the three dashes to indicate arbitrary funcalling of functions
   that take at most one string argument)
+
+
+$ compile-lisp --install --main quit --save-exe mycore
+
+- installs the arg handler code
+- sets the top-level function to QUIT
+- saves an executable core to "mycore"
+  - note: this core will just quit when executed with no arguments,
+    use ---foo options to make it do things (or any other options
+    documented here)
