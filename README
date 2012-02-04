@@ -59,6 +59,11 @@ Supported options:
                          Tip: combine this option with
                          "--install --main quit"
 
+                         NOTE: Any options given *after* either --save
+                         or --save-exe are saved and processed in the
+                         newly created core's init hook instead.
+
+
 --install                Install the load-lisp argument handler code
                          into a core being saved.  The core will be
                          able to process all the flags documented
@@ -177,3 +182,12 @@ $ compile-lisp --install --main quit --save-exe mycore
   - note: this core will just quit when executed with no arguments,
     use ---foo options to make it do things (or any other options
     documented here)
+
+
+$ compile-lisp --install --save-exe mycore -S alexandria ---print hello
+
+- installs the arg handler code
+- saves an executable core to "mycore"
+- on startup, the core "mycore" will load the system "alexandria" and print "hello"
+  - i.e. running "./mycore ---print world" will load alexandria, print
+    "hello" and print "world" in that order.

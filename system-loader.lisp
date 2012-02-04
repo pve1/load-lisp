@@ -7,6 +7,7 @@
   (require :asdf))
 
 (defparameter *toplevel-function* nil)
+(defparameter *remaining-flags* nil)
 
 (defun read-from-string-standard (s)
   (with-standard-io-syntax
@@ -43,15 +44,39 @@
 (defun inhibit-userinit ()
   (setf sb-ext::*userinit-pathname-function* (constantly nil)))
 
+
+(declaim (ftype function handle-args))
+
+;;;; Arguments after --save or --save-exe are considered zombie
+;;;; arguments, and will be processed in the saved core's init hook.
+
+(defparameter *zombie-arguments* nil)
+
+(defun set-zombie-arguments (args)
+  (setf *zombie-arguments* args))
+
+(defun handle-args-from-beyond-the-grave ()
+  (handle-args *zombie-arguments*))
+
 (defun save-flag (x &key executable inhibit-userinit)
   (let ((f (lambda (&rest rest)
+
+             (when executable
+               (sb-ext::disable-debugger))
+
+             (when inhibit-userinit
+               (inhibit-userinit))
+
+             (when *remaining-flags*
+               (let ((remaining-flags (cddr *remaining-flags*)))
+                 (set-zombie-arguments remaining-flags)
+                 (pushnew 'handle-args-from-beyond-the-grave
+                          sb-ext:*init-hooks*)))
+
              (apply #'sb-ext:save-lisp-and-die x
                     :executable (or *toplevel-function*
                                     executable)
                     rest))))
-
-    (when inhibit-userinit
-      (pushnew 'inhibit-userinit sb-ext:*init-hooks*))
 
     (if *toplevel-function*
         (funcall f :toplevel *toplevel-function*)
@@ -154,12 +179,28 @@
             functions :initial-value arg)))
 
 (defparameter *apply-flag-prefixes*
-  `(("--f-" . ,(apply-flag-op 'funcall-the-function))
-    ("--rf-" . ,(apply-flag-op 'read-from-string-standard 'funcall-the-function))
-    ("--rfp-" . ,(apply-flag-op 'read-from-string-standard 'funcall-the-function 'print))
-    ("--fp-" . ,(apply-flag-op 'funcall-the-function 'print))
-    ("--ra-" . ,(apply-flag-op 'read-from-string-standard 'apply-the-function))
-    ("--rap-" . ,(apply-flag-op 'read-from-string-standard 'apply-the-function 'print))))
+  (let ((funcall (apply-flag-op 'funcall-the-function))
+        (read-funcall (apply-flag-op 'read-from-string-standard 'funcall-the-function))
+        (read-funcall-print (apply-flag-op 'read-from-string-standard 'funcall-the-function 'print))
+        (funcall-print (apply-flag-op 'funcall-the-function 'print))
+        (read-apply (apply-flag-op 'read-from-string-standard 'apply-the-function))
+        (read-apply-print (apply-flag-op 'read-from-string-standard 'apply-the-function 'print)))
+
+  `(("--f-" . ,funcall)
+    ("--rf-" .  ,read-funcall)
+    ("--rfp-" . ,read-funcall-print)
+    ("--fp-" . ,funcall-print)
+    ("--ra-" . ,read-apply)
+    ("--rap-" . ,read-apply-print)
+
+    ;; mirror format also supported, for extra sillyness and easier
+    ;; mnemonics (pff! arrr!)
+
+    ("--fr-" . ,read-funcall)
+    ("--pfr-" . ,read-funcall-print)
+    ("--pf-" . ,funcall-print)
+    ("--ar-" . ,read-apply)
+    ("--par-" . ,read-apply-print))))
 
 (defun find-apply-flag (flag)
   (assoc-if (lambda (x) (prefixp x flag))
@@ -185,13 +226,15 @@
 ;;;; Argument handling
 
 (defun handle-args (args)
-  (loop :for (flag arg) :on args :by #'cdr
-     :for fn = (cdr (assoc flag *flag-alist* :test #'string=))
-     :do (cond ((arbitrary-funcall-p flag)
-                (arbitrary-funcall flag arg))
-               ((apply-flag-p flag)
-                (funcall (make-apply-flag-function flag) arg))
-               (fn (funcall fn arg)))))
+  (with-standard-io-syntax
+    (loop :for (flag arg) :on args :by #'cdr
+       :for *remaining-flags* = args :then (cdr *remaining-flags*)
+       :for fn = (cdr (assoc flag *flag-alist* :test #'string=))
+       :do (cond ((arbitrary-funcall-p flag)
+                  (arbitrary-funcall flag arg))
+                 ((apply-flag-p flag)
+                  (funcall (make-apply-flag-function flag) arg))
+                 (fn (funcall fn arg))))))
 
 (defun handle-posix-argv ()
   (handle-args sb-ext:*posix-argv*))
