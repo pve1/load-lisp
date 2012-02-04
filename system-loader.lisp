@@ -40,9 +40,6 @@
 (defun main-flag (x)
   (setf *toplevel-function* (read-from-string-standard x)))
 
-(defun save-exe-flag (x)
-  (save-flag x :executable t :inhibit-userinit t))
-
 (defun inhibit-userinit ()
   (setf sb-ext::*userinit-pathname-function* (constantly nil)))
 
@@ -59,6 +56,9 @@
     (if *toplevel-function*
         (funcall f :toplevel *toplevel-function*)
         (funcall f))))
+
+(defun save-exe-flag (x)
+  (save-flag x :executable t :inhibit-userinit t))
 
 (defun deps-flag (x)
   (mapc #'asdf:load-system
@@ -97,6 +97,7 @@
   (add-dir-to-asdf dir t))
 
 (defun install-arg-handler-flag (&optional x)
+  (declare (ignore x))
   (pushnew 'handle-posix-argv sb-ext:*init-hooks*))
 
 
