@@ -27,6 +27,7 @@
     ("--compile" . compile-file)
     ("--eval" . eval-flag)
     ("--load-compile" . load-compile-flag)
+    ("--clean" . clean-system-flag)
     ("--deps" . deps-flag)
     ("--main" . main-flag)
     ("--save" . save-flag)
@@ -125,6 +126,20 @@
 (defun add-tree-to-asdf (dir)
   #-asdf2 (error "Only ASDF2 supports the tree option.")
   (add-dir-to-asdf dir t))
+
+(defun clean-system-flag (system)
+  (let ((compile-op (make-instance 'asdf:compile-op)))
+    (labels ((clean (component)
+               (typecase component
+                 (asdf:module
+                  (mapc #'clean (asdf::module-components component)))
+                 (asdf:source-file
+                  (mapc (lambda (x)
+                          (when (probe-file x)
+                            (format t "Deleting ~A~%" x)
+                            (delete-file x)))
+                        (asdf:output-files compile-op component))))))
+      (clean (asdf:find-system system)))))
 
 (defun install-arg-handler-flag (&optional x)
   (declare (ignore x))
