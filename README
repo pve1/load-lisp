@@ -41,6 +41,7 @@ Supported options:
 --eval SEXP              Eval SEXP
 --load FILE              Load FILE
 --compile FILE           Compile FILE
+--clean SYSTEM           Delete FASL files associated with SYSTEM
 --load-compile FILE      First compile FILE, then load the resulting FASL
 --deps SYSTEM            Load dependencies of SYSTEM, but not SYSTEM
 --swank [PORT]           Start swank on the given port, or default port
