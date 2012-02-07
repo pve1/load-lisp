@@ -64,6 +64,16 @@
 (defun handle-args-from-beyond-the-grave ()
   (handle-args *zombie-arguments*))
 
+
+;; Current strategy:
+
+;; toplevel -> executable
+;; executable -> no debugger, inhibit-userinit
+
+;; no toplevel, executable -> repl core without debugger
+;; no toplevel, not executable -> normal core
+
+
 (defun save-flag (x &key executable inhibit-userinit)
   (let ((f (lambda (&rest rest)
 
