@@ -10,9 +10,6 @@
 
 (in-package :load-lisp)
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (require :asdf))
-
 (defparameter *toplevel-function* nil)
 (defparameter *remaining-flags* nil)
 
@@ -272,6 +269,3 @@
 
 (defun handle-posix-argv ()
   (handle-args sb-ext:*posix-argv*))
-
-;; Handle args at load-time.
-(handle-posix-argv)
