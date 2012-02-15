@@ -4,7 +4,9 @@
 ;; (http://opensource.franz.com/preamble.html), known as the LLGPL.
 
 (defpackage :load-lisp
-  (:use :cl))
+  (:use :cl)
+  (:export #:handle-posix-argv
+           #:install-arg-handler))
 
 (in-package :load-lisp)
 
