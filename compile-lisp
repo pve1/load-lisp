@@ -1,4 +1,5 @@
 #!/bin/sh
 HERE=`dirname \`readlink -f $0\``
-[ "$1" = "--core" ] && CORE="--core $2" && shift 2
-sbcl $CORE $LL_SBCL_RUNTIME_FLAGS --script $HERE/system-loader.lisp $LOAD_LISP_FLAGS "$@"
+CORE=""
+[ "$1" = "--core" ] && LL_SBCL_RUNTIME_FLAGS=("--core" "$2" "${LL_SBCL_RUNTIME_FLAGS[@]}") && shift 2
+exec sbcl "${LL_SBCL_RUNTIME_FLAGS[@]}" --script "$HERE/system-loader.lisp" "${LOAD_LISP_FLAGS[@]}" "$@"
