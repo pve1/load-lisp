@@ -256,14 +256,15 @@
 ;;;; Argument handling
 
 (defun handle-args (args)
-  (loop :for (flag arg) :on args :by #'cdr
-     :for *remaining-flags* = args :then (cdr *remaining-flags*)
-     :for fn = (cdr (assoc flag *flag-alist* :test #'string=))
-     :do (cond ((arbitrary-funcall-p flag)
-                (arbitrary-funcall flag arg))
-               ((apply-flag-p flag)
-                (funcall (make-apply-flag-function flag) arg))
-               (fn (funcall fn arg)))))
+  (let ((*package* (find-package :cl-user)))
+    (loop :for (flag arg) :on args :by #'cdr
+       :for *remaining-flags* = args :then (cdr *remaining-flags*)
+       :for fn = (cdr (assoc flag *flag-alist* :test #'string=))
+       :do (cond ((arbitrary-funcall-p flag)
+                  (arbitrary-funcall flag arg))
+                 ((apply-flag-p flag)
+                  (funcall (make-apply-flag-function flag) arg))
+                 (fn (funcall fn arg))))))
 
 (defun handle-posix-argv ()
   (handle-args sb-ext:*posix-argv*))
