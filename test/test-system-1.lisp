@@ -1,3 +1,5 @@
+(format t "~A~%" *package*)
+
 (defun main-1 ()
   (format t "test-system-1: main-1 called.~%"))
 

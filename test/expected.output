@@ -1,3 +1,4 @@
+#<PACKAGE "COMMON-LISP-USER">
 test-system-1: main-1 called.
 test-system-1: main-2 called.
 test-system-1: main-1 called.
