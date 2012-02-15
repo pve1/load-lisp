@@ -157,6 +157,8 @@
   (declare (ignore x))
   (pushnew 'handle-posix-argv sb-ext:*init-hooks*))
 
+(setf (fdefinition 'install-arg-handler)
+      #'install-arg-handler-flag)
 
 ;;;; Arbitrary-funcall "---print ..."
 
