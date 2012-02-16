@@ -35,7 +35,7 @@ command line.
 Supported options:
 
 -I DIR                   Add DIR to asdf registry
--T DIR                   Add TREE asdf to registry (asdf2 only)
+-T DIR                   Add TREE to asdf registry (asdf2 only)
 -S SYSTEM                Load SYSTEM
 -R SYSTEM                Require SYSTEM
 --eval SEXP              Eval SEXP
