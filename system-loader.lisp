@@ -6,7 +6,8 @@
 (defpackage :load-lisp
   (:use :cl)
   (:export #:handle-posix-argv
-           #:install-arg-handler))
+           #:install-arg-handler
+           #:arg-handler-installed-p))
 
 (in-package :load-lisp)
 
@@ -161,6 +162,9 @@
 (defun install-arg-handler-flag (&optional x)
   (declare (ignore x))
   (pushnew 'handle-posix-argv sb-ext:*init-hooks*))
+
+(defun arg-handler-installed-p ()
+  (find 'handle-posix-argv sb-ext:*init-hooks*))
 
 (setf (fdefinition 'install-arg-handler)
       #'install-arg-handler-flag)
