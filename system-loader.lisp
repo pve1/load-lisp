@@ -78,36 +78,51 @@
 ;; no toplevel, executable -> repl core without debugger
 ;; no toplevel, not executable -> normal core
 
+(defun %save-flag (x &key executable inhibit-userinit
+                   toplevel zombie-args)
+  
+  (let* ((executable (or executable toplevel))
 
-(defun save-flag (x &key executable inhibit-userinit)
-  (let ((f (lambda (&rest rest)
+         (f (lambda (&rest rest)
 
-             (when executable
-               (sb-ext::disable-debugger))
+              (if executable
+                  (sb-ext::disable-debugger)
+                  (sb-ext::enable-debugger))
 
-             (when inhibit-userinit
-               (inhibit-userinit))
+              (when inhibit-userinit
+                (inhibit-userinit))
 
-             ;; Don't want batch mode to carry over.
-             (setf *batch-mode* nil)
+              ;; Don't want batch mode to carry over.
+              (setf *batch-mode* nil)
+              
+              (when zombie-args
+                (set-zombie-arguments zombie-args)
+                (pushnew 'handle-args-from-beyond-the-grave
+                         sb-ext:*init-hooks*))
 
-             (when *remaining-flags*
-               (let ((remaining-flags (cddr *remaining-flags*)))
-                 (set-zombie-arguments remaining-flags)
-                 (pushnew 'handle-args-from-beyond-the-grave
-                          sb-ext:*init-hooks*)))
+              (apply #'sb-ext:save-lisp-and-die x rest))))
 
-             (apply #'sb-ext:save-lisp-and-die x
-                    :executable (or *toplevel-function*
-                                    executable)
-                    rest))))
+    (if toplevel
+        (funcall f :toplevel toplevel :executable executable)
+        (funcall f :executable executable))))
 
-    (if *toplevel-function*
-        (funcall f :toplevel *toplevel-function*)
-        (funcall f))))
+;; --save-exe foo.core --x --y --z
+;;                     ^^^^^^^^^^^    
+;;                     zombie args
 
 (defun save-exe-flag (x)
-  (save-flag x :executable t :inhibit-userinit t))
+  (%save-flag x 
+              :executable t
+              :inhibit-userinit t
+              :toplevel *toplevel-function*
+              :zombie-args (cddr *remaining-flags*)))
+
+(defun save-flag (x)
+  (%save-flag x 
+              :executable nil
+              :inhibit-userinit nil
+              :toplevel nil
+              :zombie-args (cddr *remaining-flags*)))
 
 (defun deps-flag (x)
   (mapc #'asdf:load-system
