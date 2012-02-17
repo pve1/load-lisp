@@ -87,6 +87,9 @@
              (when inhibit-userinit
                (inhibit-userinit))
 
+             ;; Don't want batch mode to carry over.
+             (setf *batch-mode* nil)
+
              (when *remaining-flags*
                (let ((remaining-flags (cddr *remaining-flags*)))
                  (set-zombie-arguments remaining-flags)
