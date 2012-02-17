@@ -2,6 +2,5 @@
 
 (in-package :cl-user)
 (require :asdf)
-(let ((me #.(or *compile-file-truename* *load-truename*)))
-  (load (merge-pathnames "system-loader.lisp" me)))
+(load (merge-pathnames "system-loader" *load-truename*))
 (load-lisp:handle-posix-argv)
