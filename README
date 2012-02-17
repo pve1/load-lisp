@@ -46,6 +46,8 @@ Supported options:
 --deps SYSTEM            Load dependencies of SYSTEM, but not SYSTEM
 --swank [PORT]           Start swank on the given port, or default port
 --quit                   Quit (only meaningful for load-lisp)
+--batch                  Process arguments normally, then quit
+                         (default behaviour for compile-lisp).
 
 --main FUNCTION          Set FUNCTION to be the toplevel function when
                          saving a core (use with --save option)
