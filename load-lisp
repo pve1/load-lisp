@@ -1,5 +1,6 @@
 #!/bin/sh
 HERE=`dirname \`readlink -f $0\``
 CORE=""
-[ "$1" = "--core" ] && LL_SBCL_RUNTIME_FLAGS=("--core" "$2" "${LL_SBCL_RUNTIME_FLAGS[@]}") && shift 2
-exec sbcl "${LL_SBCL_RUNTIME_FLAGS[@]}" --noinform --no-userinit --load "$HERE/handle-args.lisp" "${LOAD_LISP_FLAGS[@]}" "$@"
+COREFLAG=""
+[ "$1" = "--core" ] && COREFLAG="--core" && CORE="$2" && shift 2
+exec sbcl $COREFLAG ${CORE:+"$CORE"} --noinform --no-userinit --load "$HERE/handle-args" "$@"
