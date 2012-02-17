@@ -12,6 +12,7 @@
 
 (defparameter *toplevel-function* nil)
 (defparameter *remaining-flags* nil)
+(defparameter *batch-mode* nil)
 
 (defun read-from-string-standard (s)
   (with-standard-io-syntax
@@ -33,7 +34,8 @@
     ("--save-exe" . save-exe-flag)
     ("--swank" . swank-flag)
     ("--quit" . quit-flag)
-    ("--install" . install-arg-handler-flag)))
+    ("--install" . install-arg-handler-flag)
+    ("--batch" . batch-flag)))
 
 ;;;; Flag functions
 
@@ -49,6 +51,9 @@
 (defun inhibit-userinit ()
   (setf sb-ext::*userinit-pathname-function* (constantly nil)))
 
+(defun batch-flag (&optional x)
+  (declare (ignore x))
+  (setf *batch-mode* t))
 
 (declaim (ftype function handle-args))
 
@@ -268,4 +273,6 @@
                  (fn (funcall fn arg))))))
 
 (defun handle-posix-argv ()
-  (handle-args sb-ext:*posix-argv*))
+  (handle-args sb-ext:*posix-argv*)
+  (when *batch-mode*
+    (sb-ext::quit)))
