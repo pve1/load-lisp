@@ -115,8 +115,11 @@
               (apply #'sb-ext:save-lisp-and-die x rest))))
 
     (if toplevel
-        (funcall f :toplevel toplevel :executable executable)
-        (funcall f :executable executable))))
+        (funcall f :toplevel toplevel
+                 :executable executable
+                 :compression t)
+        (funcall f :executable executable
+                 :compression t))))
 
 ;; --save-exe foo.core --x --y --z
 ;;                     ^^^^^^^^^^^    
