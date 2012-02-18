@@ -11,9 +11,9 @@
 
 (in-package :load-lisp)
 
-(defparameter *toplevel-function* nil)
-(defparameter *remaining-flags* nil)
-(defparameter *batch-mode* nil)
+(defvar *toplevel-function* nil)
+(defvar *remaining-flags* nil)
+(defvar *batch-mode* nil)
 
 (defun read-from-string-standard (s)
   (with-standard-io-syntax
