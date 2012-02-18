@@ -59,7 +59,12 @@
   (eval (read-from-string-standard x)))
 
 (defun load-compile-flag (x)
-  (load (compile-file x)))
+  (let ((fasl (merge-pathnames
+               (make-pathname :type sb-fasl::*fasl-file-type*)
+               x)))
+    (if (need-recompile-p x fasl)
+        (load (compile-file x))
+        (load fasl))))
 
 (defun main-flag (x)
   (setf *toplevel-function* (read-from-string-standard x)))
