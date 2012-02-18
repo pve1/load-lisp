@@ -38,6 +38,21 @@
     ("--install" . install-arg-handler-flag)
     ("--batch" . batch-flag)))
 
+
+;;;; Util 
+
+(defun source-newer-than-fasl (source &optional fasl)
+  (<= (file-write-date fasl)
+      (file-write-date source)))
+
+(defun need-recompile-p (source &optional fasl)
+  (or (not (probe-file fasl))
+      (source-newer-than-fasl source fasl)))
+
+(defun inhibit-userinit ()
+  (setf sb-ext::*userinit-pathname-function* (constantly nil)))
+
+
 ;;;; Flag functions
 
 (defun eval-flag (x)
@@ -48,9 +63,6 @@
 
 (defun main-flag (x)
   (setf *toplevel-function* (read-from-string-standard x)))
-
-(defun inhibit-userinit ()
-  (setf sb-ext::*userinit-pathname-function* (constantly nil)))
 
 (defun batch-flag (&optional x)
   (declare (ignore x))
