@@ -301,7 +301,7 @@
 (defun apply-flag-p (flag)
   (find-apply-flag flag))
 
-(defun flagp (string)
+(defun long-flag-p (string)
   (prefixp "--" string))
 
 ;;;; Argument handling
@@ -312,10 +312,10 @@
        :for *remaining-flags* = args :then (cdr *remaining-flags*)
        :for fn = (cdr (assoc flag *flag-alist* :test #'string=))
        :do (cond (fn (funcall fn arg))
-                 ((and (flagp flag)
+                 ((and (long-flag-p flag)
                        (arbitrary-funcall-p flag))
                   (arbitrary-funcall flag arg))
-                 ((and (flagp flag)
+                 ((and (long-flag-p flag)
                        (apply-flag-p flag))
                   (funcall (make-apply-flag-function flag) arg))))))
 
