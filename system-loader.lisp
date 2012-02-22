@@ -121,10 +121,8 @@
 
     (if toplevel
         (funcall f :toplevel toplevel
-                 :executable executable
-                 :compression t)
-        (funcall f :executable executable
-                 :compression t))))
+                 :executable executable)        
+        (funcall f :executable executable))))
 
 ;; --save-exe foo.core --x --y --z
 ;;                     ^^^^^^^^^^^    
