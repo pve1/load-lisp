@@ -3,4 +3,5 @@ HERE=`dirname \`readlink -f $0\``
 CORE=""
 COREFLAG=""
 [ "$1" = "--core" ] && COREFLAG="--core" && CORE="$2" && shift 2
-exec sbcl $COREFLAG ${CORE:+"$CORE"} --noinform --disable-ldb --lose-on-corruption --disable-debugger --no-userinit --load "$HERE/handle-args" --batch "$@"
+exec sbcl $COREFLAG ${CORE:+"$CORE"} --noinform --disable-ldb --lose-on-corruption --disable-debugger --no-userinit --load "$HERE/handle-args" --end-toplevel-options --batch "$@"
+
