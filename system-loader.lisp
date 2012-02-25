@@ -71,7 +71,8 @@
 
 (defun batch-flag (&optional x)
   (declare (ignore x))
-  (setf *batch-mode* t))
+  (setf *batch-mode* t)
+  (sb-ext:disable-debugger))
 
 (declaim (ftype function handle-args))
 
